@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khushi Jain — Data Science Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d12;
+    --bg-panel: #0f141b;
+    --bg-panel-hi: #131a23;
+    --line: #1e2a35;
+    --line-bright: #2c3d4d;
+    --text: #d7e0e8;
+    --text-dim: #7c8ea0;
+    --text-faint: #4a5b6b;
+    --amber: #ffb454;
+    --amber-dim: #8a6a3c;
+    --signal: #5b9dff;
+    --signal-dim: #395a82;
+    --ok: #5fd68a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ---------- Starfield backdrop ---------- */
+  #starfield {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    opacity: 0.12;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 10%, transparent 70%);
+  }
+.moon {
+  position: fixed;
+  bottom: -140px;
+  right: -200px;
+  width: 720px;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: moonPulse 8s ease-in-out infinite;
+}
+@keyframes moonPulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .moon { animation: none; }
+}
+
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 3px;
+  }
+
+  ::selection { background: var(--amber); color: #14100a; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 2; }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    backdrop-filter: blur(10px);
+    background: rgba(10, 13, 18, 0.75);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+  .nav-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--amber);
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-id .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 8px var(--ok);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::before { content: "· "; color: var(--amber-dim); }
+  .nav-links a:hover { color: var(--amber); }
+
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 64px;
+    position: relative;
+  }
+
+  .terminal {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 36px;
+    min-height: 168px;
+  }
+  .terminal .line { opacity: 0; white-space: pre-wrap; }
+  .terminal .line.show { opacity: 1; }
+  .terminal .ok { color: var(--ok); }
+  .terminal .amber { color: var(--amber); }
+  .cursor {
+    display: inline-block;
+    width: 8px; height: 15px;
+    background: var(--amber);
+    margin-left: 4px;
+    animation: blink 1s step-end infinite;
+    vertical-align: -2px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.6rem, 6vw, 4.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: #f2f6f9;
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .hero h1 .accent { color: var(--amber); }
+
+  .hero .role {
+    margin-top: 20px;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--text-dim);
+    max-width: 640px;
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  .hero .cta-row {
+    margin-top: 40px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    padding: 13px 22px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+  }
+  .btn-primary {
+    background: var(--amber);
+    color: #14100a;
+    border: 1px solid var(--amber);
+    font-weight: 600;
+  }
+  .btn-primary:hover { box-shadow: 0 0 24px rgba(255,180,84,0.35); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--line-bright);
+  }
+  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 40px;
+    left: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .scroll-cue .line-seg {
+    width: 28px; height: 1px;
+    background: var(--text-faint);
+    animation: extend 2s ease-in-out infinite;
+    transform-origin: left;
+  }
+  @keyframes extend { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.6); } }
+
+  /* ---------- Section shells ---------- */
+  section { position: relative; padding: 120px 0; z-index: 2; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--amber);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .section-head .rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--line-bright), transparent);
+  }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    font-weight: 600;
+    color: #f2f6f9;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(.2,.7,.3,1), transform 0.7s cubic-bezier(.2,.7,.3,1);
+  }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* ---------- About ---------- */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+  @media (max-width: 800px) { .about-grid { grid-template-columns: 1fr; } }
+
+  .about-text p { color: var(--text-dim); font-size: 1.02rem; margin-bottom: 18px; max-width: 56ch; }
+  .about-text strong { color: var(--text); font-weight: 600; }
+  .about-photo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.about-photo {
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--amber-dim);
+  background: var(--bg-panel);
+  padding: 6px;
+  filter: grayscale(15%) contrast(1.05);
+  transition: transform 0.25s, box-shadow 0.4s;
+  box-shadow: 0 0 24px rgba(210, 200, 190, 0.08), 0 0 50px rgba(180, 170, 160, 0.05);
+}
+.about-photo {
+  animation: photoGlow 8s ease-in-out infinite;
+}
+@keyframes photoGlow {
+  0%, 100% {
+    box-shadow: 0 0 24px rgba(210, 200, 190, 0.08), 0 0 50px rgba(180, 170, 160, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(210, 200, 190, 0.13), 0 0 60px rgba(180, 170, 160, 0.08);
+  }
+}
+.about-photo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 32px rgba(210, 200, 190, 0.14), 0 0 60px rgba(180, 170, 160, 0.08);
+}
+.photo-caption {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--amber);
+  letter-spacing: 0.3px;
+  margin-top: -6px;
+  margin-bottom: 20px;
+  max-width: 260px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+.stat-panel {
+    border: 1px solid var(--line);
+    background: var(--bg-panel);
+    border-radius: 4px;
+    padding: 24px;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row .k { color: var(--text-faint); }
+  .stat-row .v { color: var(--text); }
+
+  /* ---------- HUD Card (used for experience + projects) ---------- */
+  .hud-card {
+    position: relative;
+    border: 1px solid var(--line);
+    background: var(--bg-panel);
+    border-radius: 4px;
+    padding: 32px;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  }
+  .hud-card:hover {
+    border-color: var(--line-bright);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+  }
+  .hud-card::before, .hud-card::after,
+  .hud-corner-br::before, .hud-corner-br::after { content: ""; position: absolute; width: 14px; height: 14px; border-color: var(--amber-dim); opacity: 0.7; transition: border-color 0.25s; }
+  .hud-card::before { top: -1px; left: -1px; border-top: 2px solid; border-left: 2px solid; }
+  .hud-card::after { top: -1px; right: -1px; border-top: 2px solid; border-right: 2px solid; }
+  .hud-card:hover::before, .hud-card:hover::after { border-color: var(--amber); }
+
+  .hud-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--amber);
+    border: 1px solid var(--amber-dim);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  .hud-tag .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+
+  .hud-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #f2f6f9;
+    margin-bottom: 6px;
+  }
+  .hud-card .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-bottom: 18px;
+  }
+  .hud-card ul { list-style: none; }
+  .hud-card ul li {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 10px;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+  .hud-card ul li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: var(--signal);
+  }
+
+  .hud-links { display: flex; gap: 14px; margin-top: 22px; flex-wrap: wrap; }
+  .hud-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--signal);
+    border-bottom: 1px solid var(--signal-dim);
+    padding-bottom: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .hud-links a:hover { color: #9cc4ff; border-color: #9cc4ff; }
+
+  .stack-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .stack-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--bg-panel-hi);
+    border: 1px solid var(--line);
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+
+  /* ---------- Projects grid ---------- */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 800px) { .projects-grid { grid-template-columns: 1fr; } }
+  .projects-grid .hud-card.wide { grid-column: 1 / -1; }
+
+  /* ---------- Skills ---------- */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 800px) { .skills-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .skills-grid { grid-template-columns: 1fr; } }
+
+  .skill-panel {
+    border: 1px solid var(--line);
+    background: var(--bg-panel);
+    padding: 20px;
+    border-radius: 4px;
+  }
+  .skill-panel .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: 14px;
+  }
+  .skill-panel .items { display: flex; flex-wrap: wrap; gap: 8px; }
+  .skill-panel .items span {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    background: var(--bg-panel-hi);
+    border: 1px solid var(--line);
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ---------- Leadership / timeline ---------- */
+  .mission-log {
+    border-left: 2px solid var(--line);
+    padding-left: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-left: 8px;
+  }
+  .log-entry { position: relative; }
+  .log-entry::before {
+    content: "";
+    position: absolute;
+    left: -38px;
+    top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--amber);
+  }
+  .log-entry .log-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--amber);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .log-entry h4 { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; color: #f2f6f9; margin-bottom: 8px; }
+  .log-entry p { color: var(--text-dim); font-size: 0.95rem; max-width: 62ch; }
+
+  /* ---------- Contact ---------- */
+  .contact-panel {
+    border: 1px solid var(--line);
+    background: var(--bg-panel);
+    border-radius: 4px;
+    padding: 56px;
+    text-align: center;
+  }
+  .contact-panel .big {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 600;
+    color: #f2f6f9;
+    margin-bottom: 20px;
+  }
+  .contact-panel .big .accent { color: var(--amber); }
+  .contact-panel p.sub { color: var(--text-dim); max-width: 50ch; margin: 0 auto 32px; }
+  .contact-links { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
+  .contact-links .btn { min-width: 190px; justify-content: center; }
+
+  footer {
+    text-align: center;
+    padding: 40px 0 60px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-faint);
+    letter-spacing: 1px;
+  }
+
+  code.inline {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--amber);
+  }
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+<div class="grid-overlay"></div>
+<img src="moon.png" alt="Moon" class="moon" />
+
+<nav>
+  <div class="wrap">
+    <div class="nav-id"><span class="dot"></span>KHUSHI_JAIN.SYS</div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#leadership">Leadership</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="terminal mono" id="terminal"></div>
+
+  <h1 id="heroTitle">Building systems that<br><span class="accent">think, match, and ship.</span></h1>
+  <p class="role" id="heroRole">Full-Stack Engineer applying a research-driven approach to build intelligent, production-ready software.</p>
+
+  <div class="cta-row" id="heroCta">
+    <a class="btn btn-primary" href="#projects">View Projects →</a>
+    <a class="btn btn-ghost" href="mailto:khushisjain05@gmail.com">Get in Touch</a>
+  </div>
+
+  <div class="scroll-cue"><span class="line-seg"></span> SCROLL</div>
+</header>
+
+<main class="wrap">
+
+  <section id="about">
+    <div class="section-head reveal">
+      <span class="section-tag">01 · About</span>
+      <span class="rule"></span>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>I'm <strong>Khushi Jain</strong>, a B.Tech CSE (Data Science) undergraduate at Manipal University Jaipur, working at the intersection of applied engineering and research.</p>
+        <p>I've built full-stack, AI-driven systems including <strong>SpeedSelect</strong>, an applicant tracking platform using semantic resume matching and automated candidate workflows, combining practical engineering with a research-driven approach to problem solving.</p>
+       <p>I carry an active interest in interdisciplinary applications of technology across space, healthcare, and emerging domains, always curious about where these fields intersect and what problems they can solve together.</p>
+      </div>
+     <div class="reveal">
+  <div class="about-photo-wrap">
+    <img src="Khushi.jpeg" alt="Khushi Jain" class="about-photo">
+  </div>
+ <div class="photo-caption">Building systems on Earth, curious about everything beyond it.</div>
+  <div class="stat-panel">
+    <div class="stat-row"><span class="k">DEGREE</span><span class="v">B.Tech CSE (Data Science)</span></div>
+    <div class="stat-row"><span class="k">INSTITUTION</span><span class="v">Manipal University Jaipur</span></div>
+    <div class="stat-row"><span class="k">TIMELINE</span><span class="v">Aug 2023 — Present</span></div>
+    <div class="stat-row"><span class="k">PATENT</span><span class="v">RankUp (filed)</span></div>
+    <div class="stat-row"><span class="k">FOCUS</span><span class="v">AI / Data Science</span></div>
+    <div class="stat-row"><span class="k">STATUS</span><span class="v" style="color:var(--ok)">● Open to opportunities</span></div>
+  </div>
+</div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="section-head reveal">
+      <span class="section-tag">02 · Experience</span>
+      <span class="rule"></span>
+    </div>
+    <div class="hud-card reveal">
+      <span class="hud-tag"><span class="dot"></span>Current</span>
+      <h3>IT Intern — Linc Limited</h3>
+      <div class="meta">May 2026 — July 2026</div>
+      <ul>
+        <li>Developed and deployed <strong style="color:var(--text)">SpeedSelect</strong>, an AI-powered Applicant Tracking System using React, Flask, MySQL (Aiven), Supabase, and the Gemini API.</li>
+        <li>Implemented AI-powered resume parsing, semantic candidate matching, and explainable candidate analysis to assist recruiter shortlisting.</li>
+        <li>Built recruiter authentication (JWT-based, cross-browser compatible), job management, candidate tracking, automated email workflows, and secure cloud-based resume storage.</li>
+        <li>Deployed the frontend on Vercel and backend on Render, integrating a cloud-hosted MySQL database for production use.</li>
+        <li>Built a read-only demo mode with sample data for public showcasing, allowing recruiters to explore the platform without exposing live company data.</li>
+        <li>Validated the matching engine using 8 synthetic candidate profiles across varied job roles, confirming accurate multi-factor scoring (skills, projects, experience, education) and correct identification of missing skill gaps with human-readable justifications.</li>
+      </ul>
+      <div class="stack-row">
+        <span class="stack-chip">React</span>
+        <span class="stack-chip">Flask</span>
+        <span class="stack-chip">MySQL / Aiven</span>
+        <span class="stack-chip">Supabase</span>
+        <span class="stack-chip">Gemini API</span>
+        <span class="stack-chip">JWT Auth</span>
+        <span class="stack-chip">Vercel</span>
+        <span class="stack-chip">Render</span>
+      </div>
+      <div class="hud-links">
+        <a href="https://khushi-ats.vercel.app/" target="_blank" rel="noopener noreferrer">↳ Live Demo</a>
+        <a href="https://github.com/Khushi240605/ats-frontend" target="_blank" rel="noopener noreferrer">↳ GitHub (Frontend)</a>
+        <a href="https://github.com/Khushi240605/ats-backend" target="_blank" rel="noopener noreferrer">↳ GitHub (Backend)</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="section-head reveal">
+      <span class="section-tag">03 · Projects</span>
+      <span class="rule"></span>
+    </div>
+    <div class="projects-grid">
+
+     <div class="hud-card wide reveal">
+  <span class="hud-tag"><span class="dot"></span>Patent Filed &amp; Published</span>
+  <h3>RankUp</h3>
+  <div class="meta">2024 — 2026</div>
+  <ul>
+    <li>Designed an interactive study platform featuring flashcards, quizzes, a stopwatch, dashboards, leaderboards, streak tracking, and a news section for academic updates.</li>
+    <li>Conducted student surveys and customized features based on user feedback to improve engagement and consistency.</li>
+    <li>Co-invented and filed a patent with Manipal University Jaipur — published May 22, 2026 (Application No. 202611043523).</li>
+  </ul>
+
+    <div class="hud-links">
+          <a href="https://github.com/Khushi240605/RankUp" target="_blank" rel="noopener noreferrer">↳ GitHub</a>
+        </div>
+      </div>
+
+      <div class="hud-card reveal">
+        <span class="hud-tag"><span class="dot"></span>Manuscript Written</span>
+        <h3>Explainable Plant Disease Detection</h3>
+        <div class="meta">CNN + Grad-CAM · 2026</div>
+        <ul>
+          <li>Built a custom CNN achieving <strong style="color:var(--text)">90.93%</strong> test accuracy on plant disease classification.</li>
+          <li>Applied Grad-CAM visualization to make predictions interpretable for farmers and agricultural experts.</li>
+          <li>Trained on the Plant Village dataset — 57,310 images across 38 disease classes.</li>
+        </ul>
+      </div>
+
+      <div class="hud-card reveal">
+        <span class="hud-tag"><span class="dot"></span>Smart India Hackathon</span>
+        <h3>Soulcare</h3>
+        <div class="meta">2025</div>
+        <ul>
+          <li>Mental health support platform with mood tracking, sleep assistance, guided meditation, and an AI chatbot.</li>
+          <li>Peer support system with therapist listings, appointment scheduling, and emergency support features.</li>
+        </ul>
+      </div>
+
+      <div class="hud-card reveal">
+        <span class="hud-tag"><span class="dot"></span>Data Analysis</span>
+        <h3>Air Quality & AQI Prediction</h3>
+        <div class="meta">2026</div>
+        <ul>
+          <li>Analyzed Indian city air quality data using Python to identify pollution trends.</li>
+          <li>Visualized AQI patterns across cities through exploratory data analysis.</li>
+        </ul>
+      </div>
+
+      <div class="hud-card reveal">
+        <span class="hud-tag"><span class="dot"></span>Coursework</span>
+        <h3>Power BI Analysis</h3>
+        <div class="meta">2024</div>
+        <ul>
+          <li>Preprocessed datasets and built analytical dashboards, presented as part of class evaluation.</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="section-head reveal">
+      <span class="section-tag">04 · Systems</span>
+      <span class="rule"></span>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-panel reveal">
+        <div class="label">Programming</div>
+        <div class="items"><span>C</span><span>C++</span><span>Python</span><span>JavaScript</span><span>SQL</span></div>
+      </div>
+      <div class="skill-panel reveal">
+        <div class="label">Frontend</div>
+        <div class="items"><span>React.js</span><span>HTML</span><span>CSS</span></div>
+      </div>
+      <div class="skill-panel reveal">
+        <div class="label">Backend</div>
+        <div class="items"><span>Flask</span><span>REST APIs</span></div>
+      </div>
+      <div class="skill-panel reveal">
+        <div class="label">Database</div>
+        <div class="items"><span>MySQL / Aiven</span><span>Supabase</span></div>
+      </div>
+      <div class="skill-panel reveal">
+        <div class="label">AI & Tools</div>
+        <div class="items"><span>Gemini API</span><span>Git</span><span>GitHub</span><span>Postman</span><span>VS Code</span></div>
+      </div>
+      <div class="skill-panel reveal">
+        <div class="label">Deployment</div>
+        <div class="items"><span>Vercel</span><span>Render</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="leadership">
+    <div class="section-head reveal">
+      <span class="section-tag">05 · Leadership</span>
+      <span class="rule"></span>
+    </div>
+    <div class="mission-log">
+      <div class="log-entry reveal">
+        <div class="log-date">2024 — 2026 · TREASURER, IEEE AESS</div>
+        <h4>IEEE Aerospace and Electronics Society — Manipal University Jaipur</h4>
+        <p>Managing chapter finances and budgeting across sponsorships, technical expos, and cross-team coordination.</p>
+      </div>
+      <div class="log-entry reveal">
+        <div class="log-date">2026 · PROJECT EXPO 4.0</div>
+        <h4>Budget & Coordination Lead</h4>
+        <p>Managed budgeting for a ₹50,000 prize pool, coordinated teams and organizers, and supported end-to-end execution of a university-level technical expo.</p>
+      </div>
+      <div class="log-entry reveal">
+        <div class="log-date">2025 · TECHNICAL EVENT, NASA-AFFILIATED SPEAKERS</div>
+        <h4>Budgeting & Coordination</h4>
+        <p>Contributed to organizing a technical event featuring NASA-affiliated professors, assisting with budgeting and coordination.</p>
+      </div>
+      <div class="log-entry reveal">
+        <div class="log-date">2025 · DRONE EVENT</div>
+        <h4>Finance Management</h4>
+        <p>Managed finances of ₹65,000, including sponsorships and budgeting for a drone-related event.</p>
+      </div>
+      <div class="log-entry reveal">
+        <div class="log-date">2024 · PROJECT EXPO 3.0</div>
+        <h4>Head of Promotions</h4>
+        <p>Organized a two-day workshop with teams across Jaipur presenting their models and skills.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="contact-panel reveal">
+      <div class="big"> Ready for my next <span class="accent">mission</span>.</div>
+      <p class="sub">Open to technical internships, research collaborations, and full-stack development roles.</p>
+      <div class="contact-links">
+      <a class="btn btn-primary" href="mailto:khushisjain05@gmail.com">Email Me ↗</a>
+        <a class="btn btn-ghost" href="https://www.linkedin.com/in/khushi-jain-205a38332/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+        <a class="btn btn-ghost" href="https://github.com/Khushi240605" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span class="mono">© 2026 KHUSHI_JAIN.SYS — DESIGNED & BUILT BY KHUSHI JAIN</span>
+</footer>
+
+<script>
+  // ---------- Starfield ----------
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = document.body.scrollHeight;
+  }
+  function initStars() {
+    const count = Math.floor((canvas.width * canvas.height) / 9000);
+   stars = Array.from({ length: count }, () => {
+  const isGlowStar = Math.random() < 0.06; // ~6% of stars glow
+  return {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: isGlowStar ? Math.random() * 1.2 + 1.4 : Math.random() * 1.1 + 0.2,
+    glow: isGlowStar,
+    s: Math.random() * 0.4 + 0.05,
+    phase: Math.random() * Math.PI * 2,
+    vx: (Math.random() * 0.04 + 0.01),
+    vy: (Math.random() * 0.03 + 0.005)
+  };
+});
+  }
+  resize();
+  initStars();
+  window.addEventListener('resize', () => { resize(); initStars(); });
+
+  // ---------- Shooting stars ----------
+  let shootingStars = [];
+  function spawnShootingStar() {
+    const startX = Math.random() * canvas.width * 0.6;
+    const startY = Math.random() * canvas.height * 0.4;
+    const angle = (Math.PI / 5) + (Math.random() * 0.3); // downward-right diagonal
+    const speed = 9 + Math.random() * 6;
+    shootingStars.push({
+      x: startX, y: startY,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0,
+      maxLife: 46 + Math.random() * 14,
+      len: 90 + Math.random() * 60
+    });
+  }
+  function scheduleNextShootingStar() {
+    const delay = 2500 + Math.random() * 3500; // every 2.5-6s
+    setTimeout(() => {
+      if (!prefersReduced) spawnShootingStar();
+      scheduleNextShootingStar();
+    }, delay);
+  }
+  if (!prefersReduced) scheduleNextShootingStar();
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // twinkling + drifting stars
+    ctx.fillStyle = '#d7e0e8';
+    stars.forEach(st => {
+      const twinkle = prefersReduced ? 1 : (0.5 + 0.5 * Math.sin(t * st.s + st.phase));
+      ctx.globalAlpha = 0.15 + twinkle * 0.55;
+      ctx.beginPath();
+      ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (!prefersReduced) {
+        st.x += st.vx;
+        st.y += st.vy;
+        // wrap around edges so drift is seamless
+        if (st.x > canvas.width + 10) st.x = -10;
+        if (st.y > canvas.height + 10) st.y = -10;
+      }
+    });
+    ctx.globalAlpha = 1;
+
+    // shooting stars
+    shootingStars.forEach(sh => {
+      const progress = sh.life / sh.maxLife;
+      const fade = progress < 0.15 ? progress / 0.15 : 1 - Math.max(0, (progress - 0.7) / 0.3);
+      const tailX = sh.x - (sh.vx / Math.hypot(sh.vx, sh.vy)) * sh.len;
+      const tailY = sh.y - (sh.vy / Math.hypot(sh.vx, sh.vy)) * sh.len;
+
+      const grad = ctx.createLinearGradient(tailX, tailY, sh.x, sh.y);
+      grad.addColorStop(0, 'rgba(255,180,84,0)');
+      grad.addColorStop(1, `rgba(255,225,180,${0.9 * fade})`);
+
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(sh.x, sh.y);
+      ctx.stroke();
+
+      ctx.fillStyle = `rgba(255,235,200,${fade})`;
+      ctx.beginPath();
+      ctx.arc(sh.x, sh.y, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+
+      sh.x += sh.vx;
+      sh.y += sh.vy;
+      sh.life++;
+    });
+    shootingStars = shootingStars.filter(sh => sh.life < sh.maxLife);
+
+    t += 0.02;
+    if (!prefersReduced) requestAnimationFrame(draw);
+  }
+  draw();
+
+  // ---------- Terminal boot sequence ----------
+  const bootLines = [
+  { text: '&gt; booting khushi_jain.sys ...', cls: '' },
+  { text: '&gt; loading modules: [data-science] [ai-systems] [full-stack] ... <span class="ok">OK</span>', cls: '' },
+  { text: '&gt; mounting interests: space · healthcare · emerging-tech ... <span class="ok">OK</span>', cls: '' },
+  { text: '&gt; status: <span class="amber">LEARNING · BUILDING · SHIPPING</span>', cls: '' },
+  { text: '&gt; user: <span class="amber">Khushi Jain</span>', cls: '' },
+];
+
+  const terminalEl = document.getElementById('terminal');
+  let lineIndex = 0;
+
+  function typeLine(line, el, callback) {
+    let i = 0;
+    // strip tags for typing effect length calc but render progressively via innerHTML slicing is messy with tags,
+    // so we just fade-type at line granularity with a short stagger for a clean, reliable effect.
+    el.innerHTML = line.text;
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(callback, 420);
+  }
+
+  function bootTerminal() {
+    if (prefersReduced) {
+      terminalEl.innerHTML = bootLines.map(l => `<div class="line show">${l.text}</div>`).join('');
+      revealHero();
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'line';
+    terminalEl.appendChild(el);
+    typeLine(bootLines[lineIndex], el, () => {
+      lineIndex++;
+      if (lineIndex < bootLines.length) {
+        bootTerminal();
+      } else {
+        const cursorLine = document.createElement('div');
+        cursorLine.className = 'line show';
+        cursorLine.innerHTML = '&gt; <span class="cursor"></span>';
+        terminalEl.appendChild(cursorLine);
+        revealHero();
+      }
+    });
+  }
+
+  function revealHero() {
+    document.getElementById('heroTitle').style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    document.getElementById('heroRole').style.transition = 'opacity 0.8s ease 0.15s, transform 0.8s ease 0.15s';
+    document.getElementById('heroCta').style.transition = 'opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s';
+    requestAnimationFrame(() => {
+      document.getElementById('heroTitle').style.opacity = 1;
+      document.getElementById('heroTitle').style.transform = 'translateY(0)';
+      document.getElementById('heroRole').style.opacity = 1;
+      document.getElementById('heroRole').style.transform = 'translateY(0)';
+      document.getElementById('heroCta').style.opacity = 1;
+      document.getElementById('heroCta').style.transform = 'translateY(0)';
+    });
+  }
+
+  bootTerminal();
+
+  // ---------- Scroll reveal ----------
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+  revealEls.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
